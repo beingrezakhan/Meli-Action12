@@ -84,9 +84,13 @@ jobs:
         run: |
           mkdir -p release_files
 
+
       - name: Download Spotify Media
         if: contains(github.event.inputs.media_url, 'spotify.com')
         shell: bash
+        env:
+          SPOTIPY_CLIENT_ID: ${{ secrets.SPOTIFY_CLIENT_ID }}
+          SPOTIPY_CLIENT_SECRET: ${{ secrets.SPOTIFY_CLIENT_SECRET }}
         run: |
           URL="${{ github.event.inputs.media_url }}"
           FORMAT="${{ github.event.inputs.output_format }}"
@@ -97,9 +101,12 @@ jobs:
           QUALITY_NUMBER=$(echo "$QUALITY" | sed 's/k//')
 
           spotdl download "$URL" \
+            --client-id "$SPOTIPY_CLIENT_ID" \
+            --client-secret "$SPOTIPY_CLIENT_SECRET" \
             --output "release_files/{title}.{output-ext}" \
             --format "$FORMAT" \
             --bitrate "$QUALITY_NUMBER"k
+            
 
       - name: Download SoundCloud Media
         if: contains(github.event.inputs.media_url, 'soundcloud.com')
